@@ -1,23 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-const DoctorAvailability = () => {
-  const doctors = [
-    { name: 'Dr. John Doe', available: '10:00 AM - 3:00 PM' },
-    { name: 'Dr. Jane Smith', available: '12:00 PM - 5:00 PM' },
-  ];
+const DoctorsPage = () => {
+    const [doctors, setDoctors] = useState([]);
 
-  return (
-    <div>
-      <h2>Doctor Availability</h2>
-      <ul>
-        {doctors.map((doctor, index) => (
-          <li key={index}>
-            <strong>{doctor.name}</strong>: {doctor.available}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+    useEffect(() => {
+        fetch('http://localhost:3000/doctors')
+            .then(response => response.json())
+            .then(data => setDoctors(data))
+            .catch(error => console.error('Error fetching doctors:', error));
+    }, []);
+
+    return (
+        <div>
+            <h1>Doctors</h1>
+            <ul>
+                {doctors.map(doctor => (
+                    <li key={doctor.DoctorID}>
+                        <h2>{doctor.Name}</h2>
+                        <p>Specialization: {doctor.Specialization}</p>
+                        <p>Email: {doctor.Email}</p>
+                        <p>Phone: {doctor.Phone}</p>
+                        <p>Available Slots: {doctor.AvailableSlots}</p>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 };
 
-export default DoctorAvailability;
+export default DoctorsPage;

@@ -1,51 +1,69 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const BookedAppointments = () => {
-  const [appointments, setAppointments] = useState([]);
+const AppointmentBooking = () => {
+  const [doctor, setDoctor] = useState('');
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
 
-  useEffect(() => {
-    const savedAppointments = JSON.parse(localStorage.getItem('appointments')) || [];
-    setAppointments(savedAppointments);
-  }, []);
-
-  const deleteAppointment = (indexToDelete) => {
-    const updatedAppointments = appointments.filter((_, index) => index !== indexToDelete);
-    setAppointments(updatedAppointments);
-    localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
-  };
-
-  const editAppointment = (indexToEdit) => {
-    const appointmentToEdit = appointments[indexToEdit];
-    const newDoctor = prompt('Enter new doctor:', appointmentToEdit.doctor);
-    const newDate = prompt('Enter new date (YYYY-MM-DD):', appointmentToEdit.date);
-    const newTime = prompt('Enter new time (HH:MM):', appointmentToEdit.time);
-
-    if (newDoctor && newDate && newTime) {
-      const updatedAppointments = [...appointments];
-      updatedAppointments[indexToEdit] = { doctor: newDoctor, date: newDate, time: newTime };
-      setAppointments(updatedAppointments);
-      localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+  const handleBooking = () => {
+    if (!doctor || !date || !time) {
+      alert('Please fill in all fields.');
+      return;
     }
+
+    const newAppointment = { doctor, date, time };
+
+    // Save appointment to localStorage
+    const savedAppointments = JSON.parse(localStorage.getItem('appointments')) || [];
+    const updatedAppointments = [...savedAppointments, newAppointment];
+    localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+
+    alert('Appointment booked successfully!');
+    console.log('Saved Appointments:', updatedAppointments);
+
+    // Clear the form
+    setDoctor('');
+    setDate('');
+    setTime('');
   };
 
   return (
     <div>
-      <h2>Booked Appointments</h2>
-      {appointments.length === 0 ? (
-        <p>No appointments booked yet.</p>
-      ) : (
-        <ul>
-          {appointments.map((appointment, index) => (
-            <li key={index}>
-              <strong>{appointment.doctor}</strong>: {appointment.date} at {appointment.time}
-              <button onClick={() => editAppointment(index)}>Edit</button>
-              <button onClick={() => deleteAppointment(index)}>Cancel</button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <h2>Book an Appointment</h2>
+      <form onSubmit={(e) => e.preventDefault()}>
+        <label>
+          Doctor:
+          <input
+            type="text"
+            value={doctor}
+            onChange={(e) => setDoctor(e.target.value)}
+          />
+        </label>
+        <br />
+        <label>
+          Date:
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </label>
+        <br />
+        <label>
+          Time:
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+          />
+        </label>
+        <br />
+        <button type="button" onClick={handleBooking}>
+          Book Appointment
+        </button>
+      </form>
     </div>
   );
 };
 
-export default BookedAppointments;
+export default AppointmentBooking;

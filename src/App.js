@@ -3,6 +3,7 @@ import DoctorAvailability from './components/DoctorAvailability';
 import AppointmentBooking from './components/AppointmentBooking';
 import BookedAppointments from './components/BookedAppointments';
 import AdminPanel from './components/AdminPanel';
+import PatientProfiles from './components/PatientProfiles';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('doctorAvailability'); // Default page
@@ -17,6 +18,8 @@ function App() {
         return <BookedAppointments />;
       case 'adminPanel':
         return <AdminPanel />;
+      case 'PatientProfiles':
+        return <PatientProfiles/>;
       default:
         return <DoctorAvailability />;
     }
@@ -50,6 +53,12 @@ function App() {
           onClick={() => setCurrentPage('adminPanel')}
         >
           Admin Panel
+        </button>
+        <button
+          className={currentPage === 'PatientProfiles' ? 'active' : ''}
+          onClick={() => setCurrentPage('PatientProfiles')}
+        >
+          PatientProfiles
         </button>
       </nav>
       {/* Render the Selected Page */}
