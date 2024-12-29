@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Login = () => {
+const Login = ({ setLoggedInUser, setCurrentPage }) => {
     const [role, setRole] = useState('Patient');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -14,7 +14,10 @@ const Login = () => {
             .then(response => response.json())
             .then(data => {
                 if (data.message === 'Login successful') {
-                    alert(`Welcome, ${data.user.name}! Role: ${data.user.role}`);
+                    setLoggedInUser(data.user);
+                    localStorage.setItem('loggedInUser', JSON.stringify(data.user)); // Save to localStorage
+                    alert(`Welcome, ${data.user.name}!`);
+                    setCurrentPage('doctorAvailability'); // Navigate to default page
                 } else {
                     alert('Invalid credentials');
                 }

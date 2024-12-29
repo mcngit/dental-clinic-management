@@ -1,69 +1,129 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const AppointmentBooking = () => {
-  const [doctor, setDoctor] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+const BookAppointment = ({ loggedInUser }) => {
+    const [doctors, setDoctors] = useState([]);
+    const [selectedDoctor, setSelectedDoctor] = useState('');
+    const [availableSlots, setAvailableSlots] = useState([]);
+    const [appointmentDate, setAppointmentDate] = useState('');
+    const [selectedTime, setSelectedTime] = useState('');
 
-  const handleBooking = () => {
-    if (!doctor || !date || !time) {
-      alert('Please fill in all fields.');
-      return;
-    }
+    // Fetch doctors from the backend
+    useEffect(() => {
+        fetch('http://localhost:3000/doctors')
+            .then(response => response.json())
+            .then(data => setDoctors(data))
+            .catch(error => console.error('Error fetching doctors:', error));
+    }, []);
 
-    const newAppointment = { doctor, date, time };
+    // Update available slots when a doctor is selected
+    useEffect(() => {
+        if (selectedDoctor) {
+            const doctor = doctors.find(d => d.DoctorID === parseInt(selectedDoctor));
+            if (doctor) {
+                const slots = JSON.parse(doctor.AvailableSlots || '[]');
+                setAvailableSlots(slots);
+            }
+        } else {
+            setAvailableSlots([]);
+        }
+    }, [selectedDoctor, doctors]);
 
-    // Save appointment to localStorage
-    const savedAppointments = JSON.parse(localStorage.getItem('appointments')) || [];
-    const updatedAppointments = [...savedAppointments, newAppointment];
-    localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+    // Handle booking an appointment
+    const handleBookAppointment = () => {
+        if (!selectedDoctor || !appointmentDate || !selectedTime) {
+            alert('Please fill in all fields.');
+            return;
+        }
 
-    alert('Appointment booked successfully!');
-    console.log('Saved Appointments:', updatedAppointments);
+        fetch('http://localhost:3000/appointments/book', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                patientId: loggedInUser.id,
+                doctorId: selectedDoctor,
+                date: appointmentDate,
+                time: selectedTime,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Appointment booked successfully!');
+                } else {
+                    alert(data.message || 'Error booking appointment.');
+                }
+            })
+            .catch(error => console.error('Error booking appointment:', error));
+    };
 
-    // Clear the form
-    setDoctor('');
-    setDate('');
-    setTime('');
-  };
+    // Generate 30-minute time slots
+    const generateTimeSlots = () => {
+        if (!availableSlots.length) return [];
+        const slots = [];
+        availableSlots.forEach(range => {
+            const [start, end] = range.split('-').map(time => {
+                const [hours, minutes] = time.split(':').map(Number);
+                return new Date(0, 0, 0, hours, minutes); // Create a Date object for easy manipulation
+            });
 
-  return (
-    <div>
-      <h2>Book an Appointment</h2>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <label>
-          Doctor:
-          <input
-            type="text"
-            value={doctor}
-            onChange={(e) => setDoctor(e.target.value)}
-          />
-        </label>
-        <br />
-        <label>
-          Date:
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-        </label>
-        <br />
-        <label>
-          Time:
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-          />
-        </label>
-        <br />
-        <button type="button" onClick={handleBooking}>
-          Book Appointment
-        </button>
-      </form>
-    </div>
-  );
+            let current = start;
+            while (current < end) {
+                const hours = current.getHours().toString().padStart(2, '0');
+                const minutes = current.getMinutes().toString().padStart(2, '0');
+                slots.push(`${hours}:${minutes}`);
+                current.setMinutes(current.getMinutes() + 30); // Increment by 30 minutes
+            }
+        });
+        return slots;
+    };
+
+    const timeSlots = generateTimeSlots();
+
+    return (
+        <div>
+            <h1>Book Appointment</h1>
+            <label>
+                Select Doctor:
+                <select
+                    value={selectedDoctor}
+                    onChange={e => setSelectedDoctor(e.target.value)}
+                >
+                    <option value="">--Select a Doctor--</option>
+                    {doctors.map(doctor => (
+                        <option key={doctor.DoctorID} value={doctor.DoctorID}>
+                            {doctor.Name} ({doctor.Specialization || 'N/A'})
+                        </option>
+                    ))}
+                </select>
+            </label>
+            <br />
+            <label>
+                Select Date:
+                <input
+                    type="date"
+                    value={appointmentDate}
+                    onChange={e => setAppointmentDate(e.target.value)}
+                />
+            </label>
+            <br />
+            <label>
+                Select Time:
+                <select
+                    value={selectedTime}
+                    onChange={e => setSelectedTime(e.target.value)}
+                >
+                    <option value="">--Select a Time Slot--</option>
+                    {timeSlots.map((time, index) => (
+                        <option key={index} value={time}>
+                            {time}
+                        </option>
+                    ))}
+                </select>
+            </label>
+            <br />
+            <button onClick={handleBookAppointment}>Book Appointment</button>
+        </div>
+    );
 };
 
-export default AppointmentBooking;
+export default BookAppointment;

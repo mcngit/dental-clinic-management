@@ -48,6 +48,36 @@ app.get('/doctors', (req, res) => {
     });
 });
 
+app.get('/patients', (req, res) => {
+    const { role } = req.headers; // Pass the role via headers
+
+    if (role !== 'Admin') {
+        return res.status(403).json({ message: 'Access denied. Admins only.' });
+    }
+
+    const query = `
+        SELECT 
+            Patients.PatientID, 
+            Patients.Name, 
+            Patients.Email, 
+            Patients.Phone, 
+            Patients.Address, 
+            GROUP_CONCAT(Appointments.AppointmentDate, ' - ', Appointments.Status SEPARATOR ', ') AS AppointmentHistory
+        FROM Patients
+        LEFT JOIN Appointments ON Patients.PatientID = Appointments.PatientID
+        GROUP BY Patients.PatientID
+    `;
+    
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching patients:', err);
+            res.status(500).send('Server error');
+            return;
+        }
+        res.json(results);
+    });
+});
+
 app.get('/appointments', (req, res) => {
     const query = `
         SELECT a.AppointmentID, p.Name AS PatientName, d.Name AS DoctorName, 
@@ -97,14 +127,58 @@ app.post('/login', (req, res) => {
             return;
         }
 
+        // Add additional fields to the user object
+        const userData = {
+            id: role === 'Admin' ? user.DoctorID : user.PatientID,
+            name: user.Name,
+            email: user.Email,
+            phone: user.Phone,
+            address: user.Address || null,
+            specialization: user.Specialization || null,
+            availableSlots: user.AvailableSlots || null,
+            role,
+        };
+
         res.status(200).json({
             message: 'Login successful',
-            user: {
-                id: user[role === 'Admin' ? 'DoctorID' : 'PatientID'],
-                name: user.Name,
-                role,
-            },
+            user: userData,
         });
+    });
+});
+
+app.post('/profile/update', (req, res) => {
+    const { id, role, email, phone, address, password, specialization, availableSlots } = req.body;
+
+    const table = role === 'Admin' ? 'Doctors' : 'Patients';
+    const idField = role === 'Admin' ? 'DoctorID' : 'PatientID';
+
+    let query = `UPDATE ${table} SET Phone = ?`;
+    const values = [phone];
+
+    if (role === 'Patient') {
+        query += `, Address = ?`;
+        values.push(address);
+    } else if (role === 'Admin') {
+        query += `, Specialization = ?, AvailableSlots = ?`;
+        values.push(specialization, availableSlots);
+    }
+
+    if (password) {
+        const hashedPassword = hashPassword(password);
+        query += `, PasswordHash = ?`;
+        values.push(hashedPassword);
+    }
+
+    query += ` WHERE ${idField} = ?`;
+    values.push(id);
+
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.error('Error updating profile:', err);
+            res.status(500).json({ success: false, message: 'Error updating profile' });
+            return;
+        }
+        res.status(200).json({ success: true, message: 'Profile updated successfully' });
     });
 });
 
@@ -174,6 +248,41 @@ app.post('/signup/patient', (req, res) => {
     }
 });
 
+app.post('/appointments/book', (req, res) => {
+    const { patientId, doctorId, date, time } = req.body;
+
+    // Check if the selected time is already booked
+    const checkQuery = `
+        SELECT * FROM Appointments
+        WHERE DoctorID = ? AND AppointmentDate = ? AND AppointmentTime = ?
+    `;
+    db.query(checkQuery, [doctorId, date, time], (err, results) => {
+        if (err) {
+            console.error('Error checking appointment availability:', err);
+            res.status(500).json({ success: false, message: 'Server error' });
+            return;
+        }
+
+        if (results.length > 0) {
+            res.status(400).json({ success: false, message: 'Selected time slot is already booked.' });
+            return;
+        }
+
+        // Insert the new appointment
+        const insertQuery = `
+            INSERT INTO Appointments (PatientID, DoctorID, AppointmentDate, AppointmentTime, Status)
+            VALUES (?, ?, ?, ?, 'Scheduled')
+        `;
+        db.query(insertQuery, [patientId, doctorId, date, time], (err, result) => {
+            if (err) {
+                console.error('Error booking appointment:', err);
+                res.status(500).json({ success: false, message: 'Error booking appointment' });
+                return;
+            }
+            res.status(200).json({ success: true, message: 'Appointment booked successfully' });
+        });
+    });
+});
 
 
 app.listen(port, () => {
