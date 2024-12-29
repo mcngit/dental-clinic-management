@@ -3,6 +3,9 @@ import DoctorAvailability from './components/DoctorAvailability';
 import AppointmentBooking from './components/AppointmentBooking';
 import BookedAppointments from './components/BookedAppointments';
 import AdminPanel from './components/AdminPanel';
+import Login from './components/Login';
+import Signup from './components/Signup.js';
+
 import PatientProfiles from './components/PatientProfiles';
 
 function App() {
@@ -20,6 +23,10 @@ function App() {
         return <AdminPanel />;
       case 'PatientProfiles':
         return <PatientProfiles/>;
+      case 'login':
+        return <Login />;
+      case 'signup':
+        return <Signup />;
       default:
         return <DoctorAvailability />;
     }
@@ -59,6 +66,18 @@ function App() {
           onClick={() => setCurrentPage('PatientProfiles')}
         >
           PatientProfiles
+        </button>
+        <button
+          className={currentPage === 'login' ? 'active' : ''}
+          onClick={() => setCurrentPage('login')}
+        >
+          Login
+        </button>
+        <button
+          className={currentPage === 'signup' ? 'active' : ''}
+          onClick={() => setCurrentPage('signup')}
+        >
+          Signup
         </button>
       </nav>
       {/* Render the Selected Page */}
