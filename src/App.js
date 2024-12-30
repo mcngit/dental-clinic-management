@@ -7,6 +7,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import PatientProfiles from './components/PatientProfiles';
 import Profiles from './components/Profiles';
+import DoctorDayHourSelector from './components/DoctorDayHourSelector';
 
 function App() {
     const [currentPage, setCurrentPage] = useState('doctorAvailability'); // Default page
@@ -31,9 +32,9 @@ function App() {
             case 'doctorAvailability':
                 return <DoctorAvailability />;
             case 'appointmentBooking':
-                return <AppointmentBooking />;
+                return <AppointmentBooking loggedInUser={loggedInUser} />;
             case 'bookedAppointments':
-                return <BookedAppointments />;
+                return <BookedAppointments loggedInUser={loggedInUser} />;
             case 'adminPanel':
                 return <AdminPanel />;
             case 'PatientProfiles':
@@ -51,6 +52,8 @@ function App() {
                 return <Signup />;
             case 'profiles':
                 return <Profiles loggedInUser={loggedInUser} />;
+            case 'doctorDayHourSelector':
+                return <DoctorDayHourSelector loggedInUser={loggedInUser} />;
             default:
                 return <DoctorAvailability />;
         }
@@ -105,12 +108,20 @@ function App() {
                     Patient Profiles
                 </button>
               )}
-              {loggedInUser.role === 'Admin' && (
+            {loggedInUser.role === 'Admin' && (
                 <button
                     className={currentPage === 'adminPanel' ? 'active' : ''}
                     onClick={() => setCurrentPage('adminPanel')}
                 >
                     Admin Panel
+                </button>
+            )}
+            {loggedInUser.role === 'Admin' && (
+                <button
+                    className={currentPage === 'doctorDayHourSelector' ? 'active' : ''}
+                    onClick={() => setCurrentPage('doctorDayHourSelector')}
+                >
+                    Set Doctor Availability
                 </button>
             )}
         </>

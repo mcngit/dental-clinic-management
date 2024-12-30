@@ -96,6 +96,173 @@ app.get('/appointments', (req, res) => {
     });
 });
 
+app.get('/appointments/all', (req, res) => {
+    const query = `
+        SELECT a.*, p.Name AS PatientName, d.Name AS DoctorName
+        FROM Appointments a
+        JOIN Patients p ON a.PatientID = p.PatientID
+        JOIN Doctors d ON a.DoctorID = d.DoctorID
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching all appointments:', err);
+            res.status(500).send('Server error');
+            return;
+        }
+        res.json(results);
+    });
+});
+
+app.post('/appointments/status', (req, res) => {
+    const { appointmentId, newStatus } = req.body;
+
+    const query = `UPDATE Appointments SET Status = ? WHERE AppointmentID = ?`;
+    db.query(query, [newStatus, appointmentId], (err, result) => {
+        if (err) {
+            console.error('Error updating status:', err);
+            res.status(500).json({ success: false, message: 'Database error' });
+            return;
+        }
+
+        if (result.affectedRows === 0) {
+            res.status(404).json({ success: false, message: 'Appointment not found' });
+            return;
+        }
+
+        res.json({ success: true });
+    });
+});
+
+
+app.post('/appointments/note', (req, res) => {
+    const { appointmentId, note } = req.body;
+    const query = `UPDATE Appointments SET Notes = ? WHERE AppointmentID = ?`;
+    db.query(query, [note, appointmentId], (err, result) => {
+        if (err) {
+            console.error('Error adding note:', err);
+            res.status(500).json({ success: false });
+            return;
+        }
+        res.json({ success: true });
+    });
+});
+
+app.delete('/appointments/delete/:appointmentId', (req, res) => {
+    const { appointmentId } = req.params;
+    const query = `DELETE FROM Appointments WHERE AppointmentID = ?`;
+    db.query(query, [appointmentId], (err, result) => {
+        if (err) {
+            console.error('Error deleting appointment:', err);
+            res.status(500).json({ success: false });
+            return;
+        }
+        res.json({ success: true });
+    });
+});
+
+// Fetch appointments for a specific patient
+app.get('/appointments/patient/:patientId', (req, res) => {
+    const { patientId } = req.params;
+    const query = `
+        SELECT a.*, d.Name AS DoctorName
+        FROM Appointments a
+        JOIN Doctors d ON a.DoctorID = d.DoctorID
+        WHERE a.PatientID = ?
+    `;
+    db.query(query, [patientId], (err, results) => {
+        if (err) {
+            console.error('Error fetching patient appointments:', err);
+            res.status(500).send('Server error');
+            return;
+        }
+        res.json(results);
+    });
+});
+
+// Fetch appointments for a specific doctor
+app.get('/appointments/doctor/:doctorId', (req, res) => {
+    const { doctorId } = req.params;
+
+    const query = `
+        SELECT a.*, p.Name AS PatientName
+        FROM Appointments a
+        JOIN Patients p ON a.PatientID = p.PatientID
+        WHERE a.DoctorID = ?
+    `;
+
+    db.query(query, [doctorId], (err, results) => {
+        if (err) {
+            console.error('Error fetching doctor appointments:', err);
+            res.status(500).send('Server error');
+            return;
+        }
+        res.json(results);
+    });
+});
+
+app.get('/profile/:id/:role', (req, res) => {
+    const { id, role } = req.params;
+
+    const table = role === 'Admin' ? 'Doctors' : 'Patients';
+    const idField = role === 'Admin' ? 'DoctorID' : 'PatientID';
+
+    const query = `SELECT * FROM ${table} WHERE ${idField} = ?`;
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('Error fetching profile:', err);
+            res.status(500).send('Server error');
+            return;
+        }
+        if (results.length === 0) {
+            res.status(404).send('User not found');
+            return;
+        }
+        res.json(results[0]);
+    });
+});
+
+app.post('/doctors/availability', (req, res) => {
+    const { doctorId, availability } = req.body;
+
+    if (!doctorId || !availability || !Array.isArray(availability)) {
+        return res.status(400).json({ success: false, message: 'Invalid input.' });
+    }
+
+    const availabilityString = JSON.stringify(availability);
+
+    const query = `UPDATE Doctors SET AvailableDays = ? WHERE DoctorID = ?`;
+    db.query(query, [availabilityString, doctorId], (err, result) => {
+        if (err) {
+            console.error('Error saving availability:', err);
+            return res.status(500).json({ success: false, message: 'Server error.' });
+        }
+
+        res.json({ success: true, message: 'Availability saved successfully.' });
+    });
+});
+
+app.get('/doctors/availability/:doctorId', (req, res) => {
+    const { doctorId } = req.params;
+
+    const query = `SELECT AvailableDays FROM Doctors WHERE DoctorID = ?`;
+    db.query(query, [doctorId], (err, results) => {
+        if (err) {
+            console.error('Error fetching availability:', err);
+            res.status(500).send('Server error');
+            return;
+        }
+
+        if (results.length === 0) {
+            res.status(404).send('Doctor not found');
+            return;
+        }
+
+        const availability = JSON.parse(results[0].AvailableDays || '[]');
+        res.json({ availability });
+    });
+});
+
+
 app.post('/login', (req, res) => {
     const { email, password, role } = req.body;
 
