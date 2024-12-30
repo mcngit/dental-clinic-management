@@ -85,15 +85,11 @@ const DoctorDayHourSelector = ({ loggedInUser }) => {
     };
 
     const saveAvailability = () => {
-        if (errors.length > 0) {
-            alert('Please fix all errors before saving.');
-            return;
-        }
-
-        const validAvailability = availability.filter(
-            item => item.day && item.slots.some(slot => slot.start && slot.end)
-        );
-
+        const validAvailability = availability.map(day => ({
+            ...day,
+            slots: day.slots.filter(slot => slot.start && slot.end), // Remove invalid slots
+        })).filter(day => day.slots.length > 0); // Remove days without valid slots
+    
         fetch('http://localhost:3000/doctors/availability', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

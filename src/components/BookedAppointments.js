@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 const BookedAppointments = ({ loggedInUser }) => {
     const [appointments, setAppointments] = useState([]);
     const [notes, setNotes] = useState({}); // Local state to manage notes input
-
     const [filterByDoctor, setFilterByDoctor] = useState(false);
 
     useEffect(() => {
@@ -21,6 +20,14 @@ const BookedAppointments = ({ loggedInUser }) => {
             .then(data => setAppointments(data))
             .catch(error => console.error('Error fetching appointments:', error));
     }, [loggedInUser, filterByDoctor]);
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        date.setDate(date.getDate() + 1); // Correct for the date offset
+        return `${date.getDate().toString().padStart(2, '0')}-${
+            (date.getMonth() + 1).toString().padStart(2, '0')
+        }-${date.getFullYear()}`;
+    };
 
     const handleChangeStatus = (appointmentId, newStatus) => {
         fetch(`http://localhost:3000/appointments/status`, {
@@ -118,7 +125,7 @@ const BookedAppointments = ({ loggedInUser }) => {
                                 <strong>Patient:</strong> {appointment.PatientName}
                             </p>
                             <p>
-                                <strong>Date:</strong> {appointment.AppointmentDate}
+                                <strong>Date:</strong> {formatDate(appointment.AppointmentDate)}
                             </p>
                             <p>
                                 <strong>Time:</strong> {appointment.AppointmentTime}

@@ -7,7 +7,6 @@ const Profiles = ({ loggedInUser }) => {
         address: '',
         password: '',
         specialization: '',
-        availableSlots: '',
     });
 
     // Fetch the latest user data from the backend
@@ -22,7 +21,6 @@ const Profiles = ({ loggedInUser }) => {
                     phone: data.Phone || '',
                     address: data.Address || '',
                     specialization: data.Specialization || '',
-                    availableSlots: data.AvailableSlots || '',
                 });
             })
             .catch(error => console.error('Error fetching user data:', error));
@@ -36,21 +34,32 @@ const Profiles = ({ loggedInUser }) => {
 
     const renderAvailableDays = () => {
         if (!userData.AvailableDays) return 'N/A';
-
+    
         const availableDays = JSON.parse(userData.AvailableDays); // Parse JSON string
-        return availableDays.map((dayData, index) => (
-            <div key={index}>
-                <strong>{dayData.day}:</strong>
-                <ul>
-                    {dayData.slots.map((slot, idx) => (
-                        <li key={idx}>
-                            {slot.start} - {slot.end}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        ));
+    
+        // Filter out days with no valid slots
+        const filteredDays = availableDays.filter(dayData => dayData.slots && dayData.slots.length > 0);
+    
+        return filteredDays.length > 0 ? (
+            filteredDays.map((dayData, index) => (
+                <div key={index}>
+                    <strong>{dayData.day}:</strong>
+                    <ul>
+                        {dayData.slots
+                            .filter(slot => slot.start && slot.end) // Filter out empty slots
+                            .map((slot, idx) => (
+                                <li key={idx}>
+                                    {slot.start} - {slot.end}
+                                </li>
+                            ))}
+                    </ul>
+                </div>
+            ))
+        ) : (
+            <p>No available days.</p>
+        );
     };
+    
 
     // Save updated profile data to the backend
     const handleUpdate = () => {
@@ -105,9 +114,6 @@ const Profiles = ({ loggedInUser }) => {
                         <p>
                             <strong>Specialization:</strong> {userData.Specialization || 'N/A'}
                         </p>
-                        <p>
-                            <strong>Available Slots:</strong> {userData.AvailableSlots || 'N/A'}
-                        </p>
                         <div>
                             <strong>Available Days:</strong>
                             {renderAvailableDays()}
@@ -139,25 +145,15 @@ const Profiles = ({ loggedInUser }) => {
                     </label>
                 )}
                 {loggedInUser.role === 'Admin' && (
-                    <>
-                        <label>
-                            Specialization:
-                            <input
-                                type="text"
-                                name="specialization"
-                                value={formData.specialization}
-                                onChange={handleInputChange}
-                            />
-                        </label>
-                        <label>
-                            Available Slots:
-                            <textarea
-                                name="availableSlots"
-                                value={formData.availableSlots}
-                                onChange={handleInputChange}
-                            />
-                        </label>
-                    </>
+                    <label>
+                        Specialization:
+                        <input
+                            type="text"
+                            name="specialization"
+                            value={formData.specialization}
+                            onChange={handleInputChange}
+                        />
+                    </label>
                 )}
                 <label>
                     Password:

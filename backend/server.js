@@ -221,6 +221,30 @@ app.get('/profile/:id/:role', (req, res) => {
     });
 });
 
+app.get('/appointments/:doctorId/:date', (req, res) => {
+    const { doctorId, date } = req.params;
+
+    console.log('API Request:', { doctorId, date }); // Log inputs
+
+    const query = `
+        SELECT AppointmentTime 
+        FROM Appointments 
+        WHERE DoctorID = ? AND AppointmentDate = ?
+    `;
+
+    db.query(query, [doctorId, date], (err, results) => {
+        if (err) {
+            console.error('Error fetching appointments:', err);
+            res.status(500).json({ success: false, message: 'Server error' });
+            return;
+        }
+
+        console.log('Query Results:', results); // Log outputs
+        res.json(results);
+    });
+});
+
+
 app.post('/doctors/availability', (req, res) => {
     const { doctorId, availability } = req.body;
 

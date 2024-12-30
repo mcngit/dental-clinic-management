@@ -9,7 +9,6 @@ const SignUp = () => {
         phone: '',
         address: '', // For Patients
         specialization: '', // For Admins
-        availableSlots: '', // For Admins
     });
 
     const handleInputChange = (e) => {
@@ -22,8 +21,8 @@ const SignUp = () => {
             alert('Address is required for Patients.');
             return;
         }
-        if (role === 'Admin' && (!formData.specialization || !formData.availableSlots)) {
-            alert('Specialization and Available Slots are required for Admins.');
+        if (role === 'Admin' && !formData.specialization) {
+            alert('Specialization is required for Admins.');
             return;
         }
     
@@ -44,7 +43,6 @@ const SignUp = () => {
             })
             .catch(error => console.error('Error during signup:', error));
     };
-    
 
     return (
         <div>
@@ -120,33 +118,18 @@ const SignUp = () => {
             )}
 
             {role === 'Admin' && (
-                <>
-                    <div>
-                        <label>
-                            Specialization:
-                            <input
-                                type="text"
-                                name="specialization"
-                                value={formData.specialization}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            Available Slots:
-                            <input
-                                type="text"
-                                name="availableSlots"
-                                value={formData.availableSlots}
-                                onChange={handleInputChange}
-                                required
-                                placeholder='E.g., ["09:00-10:00", "11:00-12:00"]'
-                            />
-                        </label>
-                    </div>
-                </>
+                <div>
+                    <label>
+                        Specialization:
+                        <input
+                            type="text"
+                            name="specialization"
+                            value={formData.specialization}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </label>
+                </div>
             )}
 
             <button onClick={handleSignUp}>Sign Up</button>
