@@ -97,12 +97,14 @@ function App() {
             </button>
     {loggedInUser && (
         <>
+            {loggedInUser.role === 'Admin' && (
             <button
                 className={currentPage === 'appointmentBooking' ? 'active' : ''}
                 onClick={() => setCurrentPage('appointmentBooking')}
             >
                 Book Appointment
             </button>
+            )}
             <button
                 className={currentPage === 'bookedAppointments' ? 'active' : ''}
                 onClick={() => setCurrentPage('bookedAppointments')}
