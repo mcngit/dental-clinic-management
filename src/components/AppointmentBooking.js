@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/AppointmentBooking.css';
 
 const AppointmentBooking = ({ loggedInUser }) => {
     const [doctors, setDoctors] = useState([]);
@@ -143,65 +144,65 @@ const AppointmentBooking = ({ loggedInUser }) => {
     };
 
     return (
-        <div>
+        <div className="booking-container">
             <h1>Book Appointment</h1>
-            <label>
-                Select Doctor:
-                <select value={selectedDoctor} onChange={e => setSelectedDoctor(e.target.value)}>
-                    <option value="">--Select a Doctor--</option>
-                    {doctors.map(doctor => (
-                        <option key={doctor.DoctorID} value={doctor.DoctorID}>
-                            {doctor.Name} ({doctor.Specialization || 'N/A'})
-                        </option>
-                    ))}
-                </select>
-            </label>
-            <br />
-            {availableDays.length > 0 && (
-                <div>
-                    <h3>Available Days</h3>
-                    <ul>
-                        {availableDays.map((day, index) => (
-                            <li key={index}>
-                                <strong>{day.day}</strong>:{" "}
-                                {day.slots.map(slot => `${slot.start}-${slot.end}`).join(", ")}
-                            </li>
+            <div className="booking-form">
+                <label>
+                    Select Doctor:
+                    <select
+                        value={selectedDoctor}
+                        onChange={e => setSelectedDoctor(e.target.value)}
+                    >
+                        <option value="">--Select a Doctor--</option>
+                        {doctors.map(doctor => (
+                            <option key={doctor.DoctorID} value={doctor.DoctorID}>
+                                {doctor.Name} ({doctor.Specialization || 'N/A'})
+                            </option>
                         ))}
-                    </ul>
-                </div>
-            )}
-            <label>
-                Select Date:
-                <input
-                    type="date"
-                    value={appointmentDate}
-                    onChange={e => setAppointmentDate(e.target.value)}
-                    min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
-                />
-            </label>
-            <p>Available Days: {availableDays.map(day => day.day).join(', ')}</p>
-            <br />
-            <label>
-                Select Time:
-                <select value={selectedTime} onChange={e => setSelectedTime(e.target.value)}>
-                    <option value="">--Select a Time Slot--</option>
-                    {timeSlots.map((slot, index) => (
-                        <option
-                            key={index}
-                            value={slot.time}
-                            disabled={!slot.available}
-                            style={{
-                                color: slot.available ? 'black' : 'red',
-                                cursor: slot.available ? 'pointer' : 'not-allowed',
-                            }}
-                        >
-                            {slot.time} {slot.available ? '' : '(Booked)'}
-                        </option>
-                    ))}
-                </select>
-            </label>
-            <br />
-            <button onClick={handleBookAppointment}>Book Appointment</button>
+                    </select>
+                </label>
+                {availableDays.length > 0 && (
+                    <div className="available-days">
+                        <h3>Available Days</h3>
+                        <ul>
+                            {availableDays.map((day, index) => (
+                                <li key={index}>
+                                    <strong>{day.day}:</strong>{' '}
+                                    {day.slots.map(slot => `${slot.start} - ${slot.end}`).join(', ')}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+                <label>
+                    Select Date:
+                    <input
+                        type="date"
+                        value={appointmentDate}
+                        onChange={e => setAppointmentDate(e.target.value)}
+                    />
+                </label>
+                <label>
+                    Select Time:
+                    <select
+                        value={selectedTime}
+                        onChange={e => setSelectedTime(e.target.value)}
+                    >
+                        <option value="">--Select a Time Slot--</option>
+                        {timeSlots.map((slot, index) => (
+                            <option
+                                key={index}
+                                value={slot.time}
+                                disabled={!slot.available}
+                                className={`time-slot ${slot.available ? 'available' : 'booked'}`}
+                            >
+                                {slot.time} {slot.available ? '' : '(Booked)'}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+                <button onClick={handleBookAppointment}>Book Appointment</button>
+            </div>
         </div>
     );
 };

@@ -1,0 +1,108 @@
+/* AppointmentBooking.css */
+.booking-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+
+.booking-container h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.booking-form {
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.booking-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.booking-form select,
+.booking-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #fdfdfd;
+}
+
+.booking-form select:focus,
+.booking-form input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+.booking-form button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.booking-form button:hover {
+    background-color: #0056b3;
+}
+
+.booking-form button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.available-days {
+    margin-bottom: 1rem;
+}
+
+.available-days h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.available-days ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.available-days li {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.time-slot {
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.time-slot.booked {
+    color: red;
+    cursor: not-allowed;
+}
+
+.time-slot.available {
+    color: black;
+    cursor: pointer;
+}

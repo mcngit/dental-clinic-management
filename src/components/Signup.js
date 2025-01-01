@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import "../styles/Signup.css";
 
 const SignUp = () => {
     const [role, setRole] = useState('Patient'); // Default role is Patient
@@ -45,94 +46,95 @@ const SignUp = () => {
     };
 
     return (
-        <div>
+        <div className="signup-container">
             <h2>Sign Up</h2>
-            <label>
-                Select Role:
-                <select value={role} onChange={(e) => setRole(e.target.value)}>
-                    <option value="Patient">Patient</option>
-                    <option value="Admin">Admin</option>
-                </select>
-            </label>
-            <div>
+            <form className="signup-form">
                 <label>
-                    Name:
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        required
-                    />
+                    Select Role:
+                    <select value={role} onChange={(e) => setRole(e.target.value)}>
+                        <option value="Patient">Patient</option>
+                        <option value="Admin">Admin</option>
+                    </select>
                 </label>
-            </div>
-            <div>
-                <label>
-                    Email:
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                    />
-                </label>
-            </div>
-            <div>
-                <label>
-                    Password:
-                    <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        required
-                    />
-                </label>
-            </div>
-            <div>
-                <label>
-                    Phone:
-                    <input
-                        type="text"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        required
-                    />
-                </label>
-            </div>
-
-            {role === 'Patient' && (
                 <div>
                     <label>
-                        Address:
-                        <textarea
-                            name="address"
-                            value={formData.address}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </label>
-                </div>
-            )}
-
-            {role === 'Admin' && (
-                <div>
-                    <label>
-                        Specialization:
+                        Name:
                         <input
                             type="text"
-                            name="specialization"
-                            value={formData.specialization}
+                            name="name"
+                            value={formData.name}
                             onChange={handleInputChange}
                             required
                         />
                     </label>
                 </div>
-            )}
+                <div>
+                    <label>
+                        Email:
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        Password:
+                        <input
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        Phone:
+                        <input
+                            type="text"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </label>
+                </div>
 
-            <button onClick={handleSignUp}>Sign Up</button>
+                {role === 'Patient' && (
+                    <div>
+                        <label>
+                            Address:
+                            <textarea
+                                name="address"
+                                value={formData.address}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </label>
+                    </div>
+                )}
+
+                {role === 'Admin' && (
+                    <div>
+                        <label>
+                            Specialization:
+                            <input
+                                type="text"
+                                name="specialization"
+                                value={formData.specialization}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </label>
+                    </div>
+                )}
+            <button type="button" onClick={handleSignUp}>Sign Up</button>
+            </form>
         </div>
     );
 };

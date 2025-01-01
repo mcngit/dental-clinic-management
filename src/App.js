@@ -8,17 +8,26 @@ import Signup from './components/Signup';
 import PatientProfiles from './components/PatientProfiles';
 import Profiles from './components/Profiles';
 import DoctorDayHourSelector from './components/DoctorDayHourSelector';
+import NotificationBell from './components/NotificationBell';
+import HomePage from './components/HomePage.js';
 
 function App() {
-    const [currentPage, setCurrentPage] = useState('doctorAvailability'); // Default page
+    const [currentPage, setCurrentPage] = useState('home'); // Default page
     const [loggedInUser, setLoggedInUser] = useState(null); // Store logged-in user info
 
     // Restore logged-in user from localStorage
     useEffect(() => {
-        const savedUser = localStorage.getItem('loggedInUser');
-        if (savedUser) {
-            setLoggedInUser(JSON.parse(savedUser));
-        }
+        // Add an event listener to clear localStorage on browser close
+        const handleBeforeUnload = () => {
+            localStorage.removeItem('loggedInUser');
+        };
+    
+        window.addEventListener('beforeunload', handleBeforeUnload);
+    
+        // Clean up the event listener
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
     }, []);
 
     const logout = () => {
@@ -29,6 +38,8 @@ function App() {
 
     const renderPage = () => {
         switch (currentPage) {
+            case 'home':
+                return <HomePage />;
             case 'doctorAvailability':
                 return <DoctorAvailability />;
             case 'appointmentBooking':
@@ -64,8 +75,9 @@ function App() {
             <header>
                 <h1>Dental Clinic Management</h1>
                 {loggedInUser ? (
-                    <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                         <p>Welcome, {loggedInUser.name}!</p>
+                        <NotificationBell loggedInUser={loggedInUser} onNavigate={() => setCurrentPage('bookedAppointments')} />
                         <button onClick={logout}>Logout</button>
                     </div>
                 ) : (
@@ -74,14 +86,20 @@ function App() {
             </header>
             {/* Navigation Menu */}
             <nav>
-    {loggedInUser && (
-        <>
+            <button
+                className={currentPage === 'home' ? 'active' : ''}
+                onClick={() => setCurrentPage('home')}
+            >
+                Home
+            </button>
             <button
                 className={currentPage === 'doctorAvailability' ? 'active' : ''}
                 onClick={() => setCurrentPage('doctorAvailability')}
             >
                 Doctor Availability
             </button>
+    {loggedInUser && (
+        <>
             <button
                 className={currentPage === 'appointmentBooking' ? 'active' : ''}
                 onClick={() => setCurrentPage('appointmentBooking')}

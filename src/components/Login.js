@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles/Login.css';
 
 const Login = ({ setLoggedInUser, setCurrentPage }) => {
     const [role, setRole] = useState('Patient');
@@ -26,25 +27,27 @@ const Login = ({ setLoggedInUser, setCurrentPage }) => {
     };
 
     return (
-        <div>
+        <div className="login-container">
             <h2>Login</h2>
-            <select value={role} onChange={e => setRole(e.target.value)}>
-                <option value="Patient">Patient</option>
-                <option value="Admin">Admin</option>
-            </select>
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-            />
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-            />
-            <button onClick={handleLogin}>Login</button>
+            <div className="login-form">
+                <select value={role} onChange={e => setRole(e.target.value)}>
+                    <option value="Patient">Patient</option>
+                    <option value="Admin">Admin</option>
+                </select>
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                />
+                <button onClick={handleLogin}>Login</button>
+            </div>
         </div>
     );
 };

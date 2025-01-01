@@ -23,7 +23,7 @@ const BookedAppointments = ({ loggedInUser }) => {
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        date.setDate(date.getDate() + 1); // Correct for the date offset
+        date.setDate(date.getDate()); // Correct for the date offset
         return `${date.getDate().toString().padStart(2, '0')}-${
             (date.getMonth() + 1).toString().padStart(2, '0')
         }-${date.getFullYear()}`;

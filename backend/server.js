@@ -200,6 +200,27 @@ app.get('/appointments/doctor/:doctorId', (req, res) => {
     });
 });
 
+// Fetch appointments for notifications
+app.get('/appointments/notifications/:userId/:role', (req, res) => {
+    const { userId, role } = req.params;
+
+    const query =
+        role === 'Admin'
+            ? `SELECT * FROM Appointments WHERE DoctorID = ?`
+            : `SELECT * FROM Appointments WHERE PatientID = ?`;
+
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching notifications:', err);
+            res.status(500).send('Server error');
+            return;
+        }
+
+        res.json(results);
+    });
+});
+
+
 app.get('/profile/:id/:role', (req, res) => {
     const { id, role } = req.params;
 

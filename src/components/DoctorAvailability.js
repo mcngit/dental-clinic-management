@@ -23,7 +23,7 @@ const DoctorsPage = () => {
     return (
         <div>
             <h1>Doctors</h1>
-            <ul>
+            <ul class="doctor-list">
                 {doctors.map(doctor => {
                     const availability = parseAvailability(doctor.AvailableDays);
                     return (
@@ -32,7 +32,7 @@ const DoctorsPage = () => {
                             <p>Specialization: {doctor.Specialization}</p>
                             <p>Email: {doctor.Email}</p>
                             <p>Phone: {doctor.Phone}</p>
-                            <div>
+                            <div class="availability">
                                 <h3>Availability:</h3>
                                 {availability ? (
                                     availability.map((item, index) => (
@@ -43,7 +43,7 @@ const DoctorsPage = () => {
                                                     item.slots.map((slot, idx) =>
                                                         slot.start && slot.end ? (
                                                             <li key={idx}>
-                                                                {slot.start} - {slot.end}
+                                                                From {slot.start} to {slot.end}
                                                             </li>
                                                         ) : null
                                                     )
@@ -54,7 +54,7 @@ const DoctorsPage = () => {
                                         </div>
                                     ))
                                 ) : (
-                                    <p>No availability set.</p>
+                                    <p class="notavailable">Doctor is not available.</p>
                                 )}
                             </div>
                         </li>
