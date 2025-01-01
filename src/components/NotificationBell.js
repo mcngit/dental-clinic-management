@@ -1,81 +1,62 @@
 import React, { useState, useEffect } from 'react';
+import "../styles/NotificationBell.css"
 
 const NotificationBell = ({ loggedInUser, onNavigate }) => {
-    const [notificationLevel, setNotificationLevel] = useState('');
+    const [urgentCount, setUrgentCount] = useState(0);
+    const [upcomingCount, setUpcomingCount] = useState(0);
 
     useEffect(() => {
         if (!loggedInUser) return;
-    
+
         fetch(`http://localhost:3000/appointments/notifications/${loggedInUser.id}/${loggedInUser.role}`)
             .then(response => response.json())
             .then(data => {
-                console.log('Fetched Appointments:', data); // Debugging
-                const now = new Date(); // Current date-time
-                let urgent = false;
-                let upcoming = false;
-    
+                const now = new Date();
+                let urgent = 0;
+                let upcoming = 0;
+
                 data.forEach(appointment => {
-                    // Correctly parse UTC date and time
                     const appointmentDate = new Date(appointment.AppointmentDate);
                     const [hours, minutes, seconds] = appointment.AppointmentTime.split(':').map(Number);
-    
-                    // Combine date and time
                     appointmentDate.setHours(hours, minutes, seconds);
-    
-                    console.log('Parsed Appointment Date-Time:', appointmentDate); // Debugging
-    
-                    const timeDiff = (appointmentDate - now) / (1000 * 60 * 60 * 24); // Difference in days
-                    console.log('Time Difference (days):', timeDiff); // Debugging
-    
+
+                    const timeDiff = (appointmentDate - now) / (1000 * 60 * 60 * 24);
+
                     if (timeDiff < 1 && timeDiff >= 0) {
-                        urgent = true; // Less than 1 day
+                        urgent++;
                     } else if (timeDiff < 7 && timeDiff >= 1) {
-                        upcoming = true; // Between 1 and 7 days
+                        upcoming++;
                     }
                 });
-    
-                console.log('Urgent:', urgent, 'Upcoming:', upcoming); // Debugging
-    
-                if (urgent) {
-                    setNotificationLevel('red');
-                } else if (upcoming) {
-                    setNotificationLevel('yellow');
-                } else {
-                    setNotificationLevel('');
-                }
+
+                setUrgentCount(urgent);
+                setUpcomingCount(upcoming);
             })
             .catch(error => console.error('Error fetching notifications:', error));
     }, [loggedInUser]);
-    
-    
-       
 
+    const totalNotifications = urgentCount + upcomingCount;
     return (
-        <div
-            style={{
-                position: 'relative',
-                cursor: 'pointer',
-                width: '24px',
-                height: '24px',
-                borderRadius: '50%',
-                backgroundColor: notificationLevel || 'gray',
-                display: 'inline-block',
-            }}
-            onClick={onNavigate}
-        >
-            {notificationLevel && (
-                <span
-                    style={{
-                        position: 'absolute',
-                        top: '-5px',
-                        right: '-5px',
-                        background: 'white',
-                        borderRadius: '50%',
-                        width: '10px',
-                        height: '10px',
-                    }}
-                />
-            )}
+        <div>
+            <div
+                style={{
+                    position: 'relative',
+                    cursor: 'pointer',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: totalNotifications > 0 ? (urgentCount > 0 ? 'red' : 'yellow') : 'gray',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    fontSize: '1rem',
+                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
+                }}
+                onClick={onNavigate}
+            >{totalNotifications > 0 ? totalNotifications : ''}
+            </div>
         </div>
     );
 };

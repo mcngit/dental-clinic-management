@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import "../styles/PatientProfiles.css"
 
 const PatientProfiles = ({ loggedInUser }) => {
     const [patients, setPatients] = useState([]); // Initialize patients state
@@ -25,24 +26,26 @@ const PatientProfiles = ({ loggedInUser }) => {
     }, [loggedInUser]);
 
     return (
-        <div>
+        <div className="patient-profiles-container">
             <h1>Patient Profiles</h1>
             {loggedInUser?.role !== 'Admin' ? (
-                <p>Access Denied: You do not have permission to view this page.</p>
+                <p className="access-denied">
+                    Access Denied: You do not have permission to view this page.
+                </p>
             ) : (
-                <ul>
+                <ul className="patient-list">
                     {patients.map(patient => (
-                        <li key={patient.PatientID}>
+                        <li key={patient.PatientID} className="patient-card">
                             <h2>{patient.Name}</h2>
                             <p>Email: {patient.Email}</p>
                             <p>Phone: {patient.Phone}</p>
                             <p>Address: {patient.Address}</p>
-                            <p>
+                            <p className="appointment-history">
                                 Appointment History:
                                 <br />
                                 {patient.AppointmentHistory
                                     ? patient.AppointmentHistory.split(',').map((appt, index) => (
-                                          <span key={index}>{appt}<br /></span>
+                                          <span key={index}>{appt}</span>
                                       ))
                                     : 'No appointments yet'}
                             </p>

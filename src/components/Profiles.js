@@ -3,6 +3,7 @@ import "../styles/Profiles.css";
 
 const Profiles = ({ loggedInUser }) => {
     const [userData, setUserData] = useState(null); // State to store user data
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [formData, setFormData] = useState({
         phone: '',
         address: '',
@@ -31,6 +32,23 @@ const Profiles = ({ loggedInUser }) => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+    };
+
+    const handleDeleteProfile = () => {
+        fetch(`http://localhost:3000/profile/delete/${loggedInUser.id}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Your profile has been deleted.');
+                    // Optionally, log the user out or redirect them
+                    window.location.href = '/login';
+                } else {
+                    alert('Error deleting profile.');
+                }
+            })
+            .catch(error => console.error('Error deleting profile:', error));
     };
 
     const renderAvailableDays = () => {
@@ -120,6 +138,22 @@ const Profiles = ({ loggedInUser }) => {
                             {renderAvailableDays()}
                         </div>
                     </>
+                )}
+                <div className="profile-actions">
+                    <button className="delete-button" onClick={() => setShowDeleteModal(true)}>
+                        Delete Profile
+                    </button>
+                </div>
+                {showDeleteModal && (
+                    <div className="modal">
+                        <div className="modal-content">
+                            <p>Are you sure you want to delete your profile?</p>
+                            <div className="modal-buttons">
+                                <button className="yes-button" onClick={handleDeleteProfile}>Yes</button>
+                                <button className="no-button" onClick={() => setShowDeleteModal(false)}>No</button>
+                            </div>
+                        </div>
+                    </div>
                 )}
             </div>
 

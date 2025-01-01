@@ -60,6 +60,34 @@
     color: #555;
 }
 
+.profile-actions {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.delete-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #d9534f;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.no-button{
+    background-color: #007bff;
+}
+
+.yes-button{
+    background-color: #d9534f;
+}
+
+.delete-button:hover{
+    background-color: #c06c69;
+}
+
 /* Form styling */
 .profile-form {
     width: 100%;

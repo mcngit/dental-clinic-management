@@ -242,6 +242,24 @@ app.get('/profile/:id/:role', (req, res) => {
     });
 });
 
+app.delete('/profile/delete/:id', (req, res) => {
+    const { id } = req.params;
+
+    const table = req.body.role === 'Admin' ? 'Doctors' : 'Patients';
+    const idField = req.body.role === 'Admin' ? 'DoctorID' : 'PatientID';
+
+    const query = `DELETE FROM ${table} WHERE ${idField} = ?`;
+
+    db.query(query, [id], (err, result) => {
+        if (err) {
+            console.error('Error deleting profile:', err);
+            res.status(500).json({ success: false, message: 'Error deleting profile' });
+        } else {
+            res.status(200).json({ success: true, message: 'Profile deleted successfully' });
+        }
+    });
+});
+
 app.get('/appointments/:doctorId/:date', (req, res) => {
     const { doctorId, date } = req.params;
 

@@ -17,7 +17,16 @@ const SignUp = () => {
         setFormData({ ...formData, [name]: value });
     };
 
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
     const handleSignUp = () => {
+        if (!validateEmail(formData.email)) {
+            alert('Invalid email address.');
+            return;
+        }
         if (role === 'Patient' && !formData.address) {
             alert('Address is required for Patients.');
             return;

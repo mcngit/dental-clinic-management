@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import "../styles/DoctorDayHourSelector.css";
 
 const DoctorDayHourSelector = ({ loggedInUser }) => {
     const [availability, setAvailability] = useState([]);
@@ -107,10 +108,10 @@ const DoctorDayHourSelector = ({ loggedInUser }) => {
     };
 
     return (
-        <div>
+        <div className="doctor-day-hour-container">
             <h1>Set Availability</h1>
             {availability.map((item, dayIndex) => (
-                <div key={dayIndex} style={{ marginBottom: '20px' }}>
+                <div key={dayIndex} className="availability-section">
                     <label>
                         Select Day:
                         <select
@@ -126,7 +127,7 @@ const DoctorDayHourSelector = ({ loggedInUser }) => {
                         </select>
                     </label>
                     {item.slots.map((slot, slotIndex) => (
-                        <div key={slotIndex} style={{ marginLeft: '20px', marginBottom: '10px' }}>
+                        <div key={slotIndex} className="slot-section">
                             <label>
                                 Start Time:
                                 <select
@@ -163,7 +164,7 @@ const DoctorDayHourSelector = ({ loggedInUser }) => {
                                 error =>
                                     error.dayIndex === dayIndex && error.slotIndex === slotIndex
                             ) && (
-                                <p style={{ color: 'red' }}>
+                                <p>
                                     {
                                         errors.find(
                                             error =>
@@ -177,8 +178,10 @@ const DoctorDayHourSelector = ({ loggedInUser }) => {
                     ))}
                 </div>
             ))}
-            <button onClick={addNewDay}>Add Another Day</button>
-            <button onClick={saveAvailability}>Save Availability</button>
+            <div className="action-buttons">
+                <button onClick={addNewDay}>Add Another Day</button>
+                <button onClick={saveAvailability}>Save Availability</button>
+            </div>
         </div>
     );
 };

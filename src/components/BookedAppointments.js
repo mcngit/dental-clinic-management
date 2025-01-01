@@ -5,6 +5,8 @@ const BookedAppointments = ({ loggedInUser }) => {
     const [appointments, setAppointments] = useState([]);
     const [notes, setNotes] = useState({}); // Local state to manage notes input
     const [filterByDoctor, setFilterByDoctor] = useState(false);
+    const [urgentCount, setUrgentCount] = useState(0);
+    const [upcomingCount, setUpcomingCount] = useState(0);
 
     useEffect(() => {
         if (!loggedInUser) return;
@@ -18,9 +20,35 @@ const BookedAppointments = ({ loggedInUser }) => {
 
         fetch(endpoint)
             .then(response => response.json())
-            .then(data => setAppointments(data))
+            .then(data => {
+                setAppointments(data);
+                calculateUrgency(data); // Determine urgency levels
+            })
             .catch(error => console.error('Error fetching appointments:', error));
     }, [loggedInUser, filterByDoctor]);
+
+    const calculateUrgency = (appointments) => {
+        const now = new Date();
+        let urgent = 0;
+        let upcoming = 0;
+
+        appointments.forEach(appointment => {
+            const appointmentDate = new Date(appointment.AppointmentDate);
+            const [hours, minutes, seconds] = appointment.AppointmentTime.split(':').map(Number);
+            appointmentDate.setHours(hours, minutes, seconds);
+
+            const timeDiff = (appointmentDate - now) / (1000 * 60 * 60 * 24); // Difference in days
+
+            if (timeDiff < 1 && timeDiff >= 0) {
+                urgent++;
+            } else if (timeDiff < 7 && timeDiff >= 1) {
+                upcoming++;
+            }
+        });
+
+        setUrgentCount(urgent);
+        setUpcomingCount(upcoming);
+    };
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -108,6 +136,16 @@ const BookedAppointments = ({ loggedInUser }) => {
     return (
         <div className="booked-appointments-container">
             <h1>Booked Appointments</h1>
+            {urgentCount > 0 && (
+                <p className="urgent-notification">
+                    {urgentCount} urgent appointment{urgentCount > 1 ? 's' : ''}
+                </p>
+            )}
+            {upcomingCount > 0 && (
+                <p className="upcoming-notification">
+                    {upcomingCount} upcoming appointment{upcomingCount > 1 ? 's' : ''}
+                </p>
+            )}
             {loggedInUser.role === 'Admin' && (
                 <button
                     className="filter-button"

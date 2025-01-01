@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import DoctorAvailability from './components/DoctorAvailability';
 import AppointmentBooking from './components/AppointmentBooking';
 import BookedAppointments from './components/BookedAppointments';
-import AdminPanel from './components/AdminPanel';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import PatientProfiles from './components/PatientProfiles';
@@ -46,8 +45,6 @@ function App() {
                 return <AppointmentBooking loggedInUser={loggedInUser} />;
             case 'bookedAppointments':
                 return <BookedAppointments loggedInUser={loggedInUser} />;
-            case 'adminPanel':
-                return <AdminPanel />;
             case 'PatientProfiles':
                 return loggedInUser && loggedInUser.role === 'Admin' ? (
                     <PatientProfiles loggedInUser={loggedInUser} />
@@ -126,14 +123,6 @@ function App() {
                     Patient Profiles
                 </button>
               )}
-            {loggedInUser.role === 'Admin' && (
-                <button
-                    className={currentPage === 'adminPanel' ? 'active' : ''}
-                    onClick={() => setCurrentPage('adminPanel')}
-                >
-                    Admin Panel
-                </button>
-            )}
             {loggedInUser.role === 'Admin' && (
                 <button
                     className={currentPage === 'doctorDayHourSelector' ? 'active' : ''}

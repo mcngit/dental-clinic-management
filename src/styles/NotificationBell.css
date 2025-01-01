@@ -1,0 +1,8 @@
+.notification-bell {
+    border: 2px solid white;
+    transition: transform 0.2s ease-in-out;
+}
+
+.notification-bell:hover {
+    transform: scale(1.1);
+}
