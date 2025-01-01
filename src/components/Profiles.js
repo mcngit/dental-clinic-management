@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import "../styles/Profiles.css";
 
 const Profiles = ({ loggedInUser }) => {
     const [userData, setUserData] = useState(null); // State to store user data
@@ -86,11 +87,11 @@ const Profiles = ({ loggedInUser }) => {
     if (!userData) return <p>Loading profile...</p>;
 
     return (
-        <div>
+        <div className="profile-container">
             <h1>Your Profile</h1>
 
             {/* Display current user details */}
-            <div>
+            <div className="profile-details">
                 <h2>Current Information</h2>
                 <p>
                     <strong>Name:</strong> {userData.Name}
@@ -123,7 +124,7 @@ const Profiles = ({ loggedInUser }) => {
             </div>
 
             {/* Form for updating details */}
-            <div>
+            <div className="profile-form">
                 <h2>Edit Your Details</h2>
                 <label>
                     Phone:

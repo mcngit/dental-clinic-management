@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import "../styles/BookedAppointments.css";
 
 const BookedAppointments = ({ loggedInUser }) => {
     const [appointments, setAppointments] = useState([]);
@@ -105,19 +106,22 @@ const BookedAppointments = ({ loggedInUser }) => {
     };
 
     return (
-        <div>
+        <div className="booked-appointments-container">
             <h1>Booked Appointments</h1>
             {loggedInUser.role === 'Admin' && (
-                <button onClick={() => setFilterByDoctor(!filterByDoctor)}>
+                <button
+                    className="filter-button"
+                    onClick={() => setFilterByDoctor(!filterByDoctor)}
+                >
                     {filterByDoctor ? 'View All Appointments' : 'View My Appointments'}
                 </button>
             )}
             {appointments.length === 0 ? (
-                <p>No appointments found.</p>
+                <p className="no-appointments-message">No appointments found.</p>
             ) : (
-                <ul>
+                <ul className="appointment-list">
                     {appointments.map(appointment => (
-                        <li key={appointment.AppointmentID}>
+                        <li key={appointment.AppointmentID} className="appointment-item">
                             <p>
                                 <strong>Doctor:</strong> {appointment.DoctorName}
                             </p>
@@ -137,40 +141,27 @@ const BookedAppointments = ({ loggedInUser }) => {
                                 <strong>Notes:</strong> {appointment.Notes || 'No notes yet'}
                             </p>
                             {loggedInUser.role === 'Admin' && (
-                                <>
-                                    <button
-                                        onClick={() =>
-                                            handleChangeStatus(appointment.AppointmentID, 'Completed')
-                                        }
-                                    >
+                                <div className="appointment-buttons">
+                                    <button onClick={() => handleChangeStatus(appointment.AppointmentID, 'Completed')}>
                                         Mark as Completed
                                     </button>
-                                    <button
-                                        onClick={() =>
-                                            handleChangeStatus(appointment.AppointmentID, 'Cancelled')
-                                        }
-                                    >
+                                    <button onClick={() => handleChangeStatus(appointment.AppointmentID, 'Cancelled')}>
                                         Mark as Cancelled
                                     </button>
                                     <input
                                         type="text"
                                         placeholder="Enter a note"
+                                        className="note-input"
                                         value={notes[appointment.AppointmentID] || ''}
-                                        onChange={e =>
-                                            handleNoteChange(appointment.AppointmentID, e.target.value)
-                                        }
+                                        onChange={e => handleNoteChange(appointment.AppointmentID, e.target.value)}
                                     />
-                                    <button
-                                        onClick={() => handleAddNote(appointment.AppointmentID)}
-                                    >
+                                    <button onClick={() => handleAddNote(appointment.AppointmentID)}>
                                         Add Note
                                     </button>
-                                    <button
-                                        onClick={() => handleDeleteAppointment(appointment.AppointmentID)}
-                                    >
+                                    <button onClick={() => handleDeleteAppointment(appointment.AppointmentID)}>
                                         Delete Appointment
                                     </button>
-                                </>
+                                </div>
                             )}
                             {loggedInUser.role !== 'Admin' && appointment.Status !== 'Cancelled' && (
                                 <button
